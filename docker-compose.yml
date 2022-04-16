@@ -1,0 +1,46 @@
+version: '3'
+services:
+  db:
+    container_name: arch_db
+    build: ./secrets/mysql
+    networks:
+      - default
+    environment:
+      - MYSQL_ROOT_PASSWORD=password123
+    volumes:
+      - ./database/data:/var/lib/mysql
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    networks:
+      - arch_net
+
+  app:
+    container_name: arch_app
+    build:
+      context: ./
+      dockerfile: ./secrets/app/Dockerfile
+    volumes:
+      - ./app_server/qiita:/go/qiita
+    tty: true
+    depends_on:
+      - db
+    networks:
+      - arch_net
+
+  web:
+    container_name: arch_web
+    image: nginx:latest
+    volumes:
+      - ./secrets/nginx/local/conf.d:/etc/nginx/conf.d
+    ports:
+      - "8080:80"
+    depends_on:
+      - app
+    networks:
+      - arch_net
+
+networks:
+  arch_net:
+    driver: bridge

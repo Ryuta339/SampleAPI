@@ -1,0 +1,3 @@
+[mysqld]
+defalut_authentication_plugin= mysql_native_password
+
